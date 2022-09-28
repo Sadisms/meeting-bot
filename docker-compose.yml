@@ -33,6 +33,7 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
+      - .:/meeting-bot
       - ./logs:/meeting-bot/logs
     command: python3 oauth_server.py
     networks:

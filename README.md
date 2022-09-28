@@ -31,6 +31,6 @@ ngrok http 5000 # Адрес занести в .env
 ### Запуск в контейнере
 ```shell
 docker-compose build --no-cache bot
-docker-compose run meeting-bot python3 migrator.py migrate
+docker-compose run bot python3 migrator.py migrate
 docker-compose up -d
 ```
