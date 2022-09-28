@@ -14,7 +14,7 @@ def upgrade(migrator):
     with migrator.create_table('meet_user_credentials') as table:
         table.primary_key('id')
         table.char('user_id')
-        table.text('credentials', null=True)
+        table.bytea('credentials', null=True)
 
 
 def downgrade(migrator):
