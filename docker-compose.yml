@@ -38,6 +38,7 @@ services:
     command: python3 oauth_server.py
     networks:
       - ngrok-network
+      - host
 
   auth-bot-ngrok:
       image: shkoliar/ngrok:latest
@@ -60,3 +61,7 @@ services:
 networks:
   ngrok-network:
     driver: bridge
+
+  host:
+    external: true
+    name: 'host'
