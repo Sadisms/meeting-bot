@@ -12,6 +12,19 @@ services:
     command: python3 app.py
     network_mode: host
 
+  auth-bot:
+    image: meeting-bot:latest
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./logs:/meeting-bot/logs
+    command: python3 auth.py
+    network_mode: host
+    ports:
+      - "3000:3000"
+
   oauth-server:
     image: meeting-bot:latest
     restart: always
