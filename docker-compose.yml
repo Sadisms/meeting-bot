@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+  meeting-bot:
+    image: meeting-bot:latest
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./logs:/meeting-bot/logs
+    command: python3 app.py
+    network_mode: host
+
+  oauth-server:
+    image: meeting-bot:latest
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - ./logs:/meeting-bot/logs
+    command: python3 oauth_server.py
+    network_mode: host
