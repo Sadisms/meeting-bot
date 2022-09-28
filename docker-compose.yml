@@ -22,5 +22,5 @@ services:
       - ./logs:/meeting-bot/logs
     command: python3 oauth_server.py
     network_mode: host
-    expose:
+    ports:
       - "5000:5000"
