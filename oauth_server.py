@@ -1,4 +1,4 @@
-from flask import Flask, request, redirect, session
+from flask import Flask, request, redirect
 from slack_bolt.app.async_app import AsyncApp
 
 from api.google_api import GoogleService
@@ -30,4 +30,4 @@ async def hello_world():
 
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host='0.0.0.0')
