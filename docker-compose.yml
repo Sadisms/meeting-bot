@@ -8,7 +8,7 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - .:.
+      - .:/meeting-bot
       - ./logs:/meeting-bot/logs
     command: python3 app.py
     network_mode: host
@@ -20,7 +20,7 @@ services:
       context: .
       dockerfile: Dockerfile
     volumes:
-      - .:.
+      - .:/meeting-bot
       - ./logs:/meeting-bot/logs
     command: python3 auth.py
     networks:
