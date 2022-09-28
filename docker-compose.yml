@@ -38,7 +38,7 @@ services:
     command: python3 oauth_server.py
     network_mode: "host"
     expose:
-      - 5000:5000
+      - 5000
 
   auth-bot-ngrok:
       image: shkoliar/ngrok:latest
