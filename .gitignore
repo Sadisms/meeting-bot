@@ -140,6 +140,7 @@ cython_debug/
 
 
 # Custom
+.env_meeting
 token.json
 ._.db
 .idea/
