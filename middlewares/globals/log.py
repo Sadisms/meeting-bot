@@ -2,7 +2,7 @@ from bot import app
 from utils.logging import create_logger
 
 
-logger = create_logger('request', 'slack_request')
+logger = create_logger('slack_request')
 
 
 @app.middleware
