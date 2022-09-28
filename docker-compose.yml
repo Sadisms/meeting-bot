@@ -56,7 +56,7 @@ services:
     environment:
       - PARAMS=http oauth-server:5000 --region=ap --authtoken=${NGROK_AUTH_TOKEN}
     ports:
-      - "4551:4552"
+      - "4551:4551"
 
 networks:
   ngrok-network:
