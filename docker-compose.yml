@@ -37,6 +37,8 @@ services:
       - ./logs:/meeting-bot/logs
     command: python3 oauth_server.py
     network_mode: "host"
+    expose:
+      - 5000:5000
 
   auth-bot-ngrok:
       image: shkoliar/ngrok:latest
@@ -49,7 +51,8 @@ services:
 
   oauth-server-ngrok:
     image: shkoliar/ngrok:latest
-    network_mode: "host"
+    networks:
+      - ngrok-network
     environment:
       - PARAMS=http oauth-server:5000 --region=ap --authtoken=${NGROK_AUTH_TOKEN}
     ports:
