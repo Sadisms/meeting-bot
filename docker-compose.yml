@@ -49,8 +49,7 @@ services:
 
   oauth-server-ngrok:
     image: shkoliar/ngrok:latest
-    networks:
-      - ngrok-network
+    network_mode: "host"
     environment:
       - PARAMS=http oauth-server:5000 --region=ap --authtoken=${NGROK_AUTH_TOKEN}
     ports:
