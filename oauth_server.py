@@ -31,4 +31,4 @@ async def hello_world():
 
 
 if __name__ == "__main__":
-    run_with_ngrok(app.run, 5000, save_url='etc\\oauth-server')
+    run_with_ngrok(app.run, 5000, save_url='etc/oauth-server')
