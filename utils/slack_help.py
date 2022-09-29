@@ -228,7 +228,6 @@ class ThreadWithResult(Thread):
 
 
 def run_with_ngrok(func, port, protocol='http', region='us', save_url=None, kwargs=None):
-    print(os.environ['NGROK_AUTH_TOKEN'])
     ngrok.set_auth_token(os.environ['NGROK_AUTH_TOKEN'])
     thread = ThreadWithResult(target=ngrok.connect, args=(port, protocol), kwargs={'region': region})
     thread.start()
