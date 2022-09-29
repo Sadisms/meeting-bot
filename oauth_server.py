@@ -15,7 +15,7 @@ app.secret_key = FLASK_SECRET_KEY
 async def hello_world():
     if user := await get_user_for_state(request.args.get('state')):
         service = GoogleService()
-        service.creds.redirect_uri = OAUTH_URL + 'oauth2callback'
+        service.creds.redirect_uri = OAUTH_URL + '/oauth2callback'
         service.auth(request.url.replace('http', 'https'))
 
         await set_user_credentials(user.user_id, service.creds.credentials)

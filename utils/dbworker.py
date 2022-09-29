@@ -1,4 +1,3 @@
-from data.config import OAUTH_URL
 from .models.google_models import UserCredentials
 from .models.backend_models import OAuthModel
 from .models.base import conn
