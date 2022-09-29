@@ -236,6 +236,6 @@ def run_with_ngrok(func, port, protocol='http', region='us', save_url=None, kwar
     print(thread.result)
     if save_url:
         with open(save_url, 'w') as f:
-            f.write(thread.result.public_url.replace('http', 'https'))
+            f.write(thread.result.public_url)
 
     func(**(kwargs or {}))

@@ -46,5 +46,5 @@ docker-compose up -d bot
 данный URl нужно указать в:
 ```shell
 google console > Credentials > OAuth 2.0 Client IDs
-Authorized JavaScript origins(сама URL) и Authorized redirect URIs(url + /oauth2callback)
+Authorized redirect URIs(url + /oauth2callback)
 ```
