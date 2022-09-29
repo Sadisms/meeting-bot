@@ -11,6 +11,8 @@ services:
       - .:/meeting-bot
     command: python3 app.py
     network_mode: host
+    environment:
+      - TZ=Asia/Omsk
 
   auth-bot:
     image: meeting-bot:latest
