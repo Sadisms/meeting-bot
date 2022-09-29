@@ -13,7 +13,8 @@ SCOPES = [
 ]
 SENTRY_TOKEN = env.str("sentry_token")
 
-OAUTH_URL = env.str('OAUTH_URL')
+with open('etc/oauth-server', 'r') as f:
+    OAUTH_URL = f.read()
 
 FLASK_SECRET_KEY = env.str('FLASK_SECRET_KEY')
 
