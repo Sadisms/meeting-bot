@@ -76,7 +76,7 @@ class GoogleService:
 
     async def get_user_creds(self, user_id, token, respond):
         if creds := await get_user_credentials(user_id):
-            if creds.expiry > datetime.utcnow():
+            if creds.expiry < datetime.utcnow():
                 request = google.auth.transport.requests.Request()
                 creds.refresh(request)
                 await set_user_credentials(user_id, creds)
@@ -85,7 +85,7 @@ class GoogleService:
 
         self.creds.redirect_uri = OAUTH_URL()
         authorization_url, state = self.creds.authorization_url(
-            access_type='offline',
+            access_type='offline'
         )
 
         await create_redirect_uri(

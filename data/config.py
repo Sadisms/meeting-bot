@@ -5,7 +5,7 @@ from environs import Env
 env = Env()
 env.read_env(path='.env_meeting')
 
-DEBUG = env.str('DEBUG', False)
+DEBUG = env.bool('DEBUG', False)
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 GOOGLE_TOKEN_FILE = BASE_DIR / 'token.json'

@@ -27,7 +27,11 @@ async def hello_world():
             blocks=help_message_block()
         )
 
-    return redirect('slack://')
+    return """
+    <script>
+    window.close();
+    </script>
+    """
 
 
 if __name__ == "__main__":
