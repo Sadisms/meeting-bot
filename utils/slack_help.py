@@ -1,4 +1,5 @@
 import datetime
+from pytz import timezone
 import re
 from typing import Union
 from zoneinfo import ZoneInfo
@@ -35,8 +36,12 @@ async def user_not_bot(client, user_id):
     return not user['is_bot']
 
 
+def set_time_zone(date, time_zone):
+    return date.astimezone(timezone(time_zone))
+
+
 def get_str_date(date, time_zone) -> str:
-    return date.replace(tzinfo=ZoneInfo(time_zone)).isoformat()
+    return set_time_zone(date, time_zone).isoformat()
 
 
 def parse_args_command(text: str = '', time_zone: str = 'Asia/Omsk') -> dict:
@@ -239,3 +244,7 @@ def run_with_ngrok(func, port, protocol='http', region='us', save_url=None, kwar
             f.write(thread.result.public_url + '/oauth2callback')
 
     func(**(kwargs or {}))
+
+
+def get_time_zone_short_name(time_zone: str) -> str:
+    return timezone(time_zone).tzname(datetime.datetime.now())

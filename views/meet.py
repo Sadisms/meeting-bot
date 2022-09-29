@@ -4,8 +4,12 @@ from slack_sdk.models.blocks import InputBlock, SectionBlock, DatePickerElement,
     UserMultiSelectElement, PlainTextInputElement, StaticSelectElement, Option
 from slack_sdk.models.views import View
 
+from utils.slack_help import set_time_zone
 
-def create_meet_view():
+
+def create_meet_view(time_zone: str = 'Asia/Omsk'):
+    now = set_time_zone(datetime.datetime.now(), time_zone)
+
     time_options = [
           Option(
               text=f'{x} mins',
@@ -34,7 +38,7 @@ def create_meet_view():
                 block_id='date1:date',
                 accessory=DatePickerElement(
                     action_id='stub:1',
-                    initial_date=datetime.datetime.now().strftime('%Y-%m-%d')
+                    initial_date=now.strftime('%Y-%m-%d')
                 )
             ),
             SectionBlock(
@@ -42,7 +46,7 @@ def create_meet_view():
                 block_id='date1:time',
                 accessory=TimePickerElement(
                     action_id='stub:2',
-                    initial_time=datetime.datetime.now().strftime('%H:%M')
+                    initial_time=now.strftime('%H:%M')
                 )
             ),
             SectionBlock(

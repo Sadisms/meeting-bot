@@ -8,11 +8,12 @@ from api.google_api import GoogleService
 from blocks.meet import call_block, help_message_block
 from bot import app
 from utils.slack_help import parse_args_command, get_user_tz, get_data_from_blocks, \
-    get_user_email, parse_date_and_time, user_not_bot, get_like_data_str, get_duration, parse_datetime
+    get_user_email, parse_date_and_time, user_not_bot, get_like_data_str, get_duration, parse_datetime, \
+    get_time_zone_short_name
 from views.meet import create_meet_view
 
 
-async def send_meet(body, client, respond, say, args=None, users=None, thread_ts=''):
+async def send_meet(body, client, respond, say, time_zone, args=None, users=None, thread_ts=''):
     if users is None:
         users = []
 
@@ -33,7 +34,7 @@ async def send_meet(body, client, respond, say, args=None, users=None, thread_ts
             url=meet_url,
             user_id=user_id,
             title=args.get('title') or 'My Meet',
-            start=get_like_data_str(parse_datetime(args.get('date1'))),
+            start=f"{get_like_data_str(parse_datetime(args.get('date1')))} {get_time_zone_short_name(time_zone)}",
             duration=get_duration(args.get('date2'), args.get('date1')),
             description=args.get('description', ''),
             users=users
@@ -69,13 +70,16 @@ async def send_meet(body, client, respond, say, args=None, users=None, thread_ts
 async def gmeet_now(ack, say, body, client, respond):
     await ack()
 
+    time_zone = await get_user_tz(client, body.get('user_id') or body['user']['id'])
+
     await send_meet(
         body=body,
         client=client,
         respond=respond,
         say=say,
+        time_zone=time_zone,
         args=parse_args_command(
-            time_zone=await get_user_tz(client, body.get('user_id') or body['user']['id'])
+            time_zone=time_zone
         ),
         thread_ts=body.get('message_ts', '')  # message_ts Будет в случае если был вызван shortcut
     )
@@ -86,6 +90,7 @@ async def init_call_command(ack, body, respond, client: AsyncWebClient, say):
     await ack()
     text = body.get('text', '').strip()
     user_id = body['user_id']
+    time_zone = await get_user_tz(client, user_id)
 
     if text.startswith('help'):
         await client.chat_postMessage(
@@ -99,9 +104,10 @@ async def init_call_command(ack, body, respond, client: AsyncWebClient, say):
             client=client,
             respond=respond,
             say=say,
+            time_zone=time_zone,
             args=parse_args_command(
                 text=text,
-                time_zone=await get_user_tz(client, user_id)
+                time_zone=time_zone
             )
         )
 
@@ -110,7 +116,7 @@ async def init_call_command(ack, body, respond, client: AsyncWebClient, say):
         if await google_service.get_user_creds(user_id, client.token, respond):
             await client.views_open(
                 trigger_id=body['trigger_id'],
-                view=create_meet_view()
+                view=create_meet_view(time_zone)
             )
 
 
@@ -118,7 +124,7 @@ async def init_call_command(ack, body, respond, client: AsyncWebClient, say):
 async def meet_view_send(ack, body, client, say, respond):
     await ack()
 
-    user_tz = await get_user_tz(client, body['user']['id'])
+    time_zone = await get_user_tz(client, body['user']['id'])
 
     data_from_blocks, _ = await get_data_from_blocks(body['view']['state']['values'])
 
@@ -133,12 +139,12 @@ async def meet_view_send(ack, body, client, say, respond):
     data_from_blocks['date1'] = parse_date_and_time(
         date=data_from_blocks.pop('date1:date'),
         time=data_from_blocks.pop('date1:time') + ':00',
-        time_zone=user_tz
+        time_zone=time_zone
     )
     data_from_blocks['date2'] = parse_date_and_time(
         date=data_from_blocks['date1'],
         time=data_from_blocks['date2'] + ':00',
-        time_zone=user_tz
+        time_zone=time_zone
     )
 
     await send_meet(
@@ -146,6 +152,7 @@ async def meet_view_send(ack, body, client, say, respond):
         client=client,
         respond=respond,
         say=say,
+        time_zone=time_zone,
         args=data_from_blocks,
         users=users_ids
     )
