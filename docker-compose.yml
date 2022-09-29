@@ -21,8 +21,6 @@ services:
     volumes:
       - .:/meeting-bot
     command: python3 auth.py
-    environment:
-      - NGROK_AUTH_TOKEN=${NGROK_AUTH_TOKEN}
 
   oauth-server:
     image: meeting-bot:latest
@@ -34,5 +32,3 @@ services:
       - .:/meeting-bot
     command: python3 oauth_server.py
     network_mode: "host"
-    environment:
-      - NGROK_AUTH_TOKEN=${NGROK_AUTH_TOKEN}

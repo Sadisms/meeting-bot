@@ -1,6 +1,5 @@
 import datetime
 import re
-import os
 from typing import Union
 from zoneinfo import ZoneInfo
 from threading import Thread
@@ -10,7 +9,7 @@ import pytimeparse
 from pyngrok import ngrok, conf
 from slack_sdk.models.blocks import SectionBlock
 
-from data.config import MAX_LEN_SECTION_TEXT
+from data.config import MAX_LEN_SECTION_TEXT, NGROK_TOKEN
 from utils.cache import memoize
 
 
@@ -228,7 +227,7 @@ class ThreadWithResult(Thread):
 
 
 def run_with_ngrok(func, port, protocol='http', region='us', save_url=None, kwargs=None):
-    ngrok.set_auth_token(os.environ['NGROK_AUTH_TOKEN'])
+    ngrok.set_auth_token(NGROK_TOKEN)
     conf.get_default().region = region
     thread = ThreadWithResult(target=ngrok.connect, args=(port, protocol))
     thread.start()

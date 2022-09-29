@@ -13,6 +13,8 @@ SCOPES = [
 ]
 SENTRY_TOKEN = env.str("sentry_token")
 
+NGROK_TOKEN = env.str("NGROK_TOKEN")
+
 with open('etc/oauth-server', 'r') as f:
     OAUTH_URL = f.read()
 
