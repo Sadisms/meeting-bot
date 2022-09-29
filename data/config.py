@@ -15,9 +15,6 @@ SENTRY_TOKEN = env.str("sentry_token")
 
 NGROK_TOKEN = env.str("NGROK_TOKEN")
 
-with open('etc/oauth-server', 'r') as f:
-    OAUTH_URL = f.read()
-
 FLASK_SECRET_KEY = env.str('FLASK_SECRET_KEY')
 
 MAX_LEN_SECTION_TEXT = 2999  # 3000
@@ -35,3 +32,8 @@ DB_CONFIG = {
     'user': env.str('DB_USER'),
     'password': env.str('DB_PASS'),
 }
+
+
+def OAUTH_URL():
+    with open('etc/oauth-server', 'r') as f:
+        return f.read()

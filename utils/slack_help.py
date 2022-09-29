@@ -13,6 +13,13 @@ from data.config import MAX_LEN_SECTION_TEXT, NGROK_TOKEN
 from utils.cache import memoize
 
 
+class ThreadWithResult(Thread):
+    def __init__(self, group=None, target=None, name=None, args=(), kwargs={}, *, daemon=None):
+        def function():
+            self.result = target(*args, **kwargs)
+        super().__init__(group=group, target=function, name=name, daemon=daemon)
+
+
 @memoize()
 async def _get_user_info(client, user_id):
     return (await client.users_info(user=user_id)).data['user']
@@ -219,13 +226,6 @@ def split_text_section(text: str) -> list[SectionBlock]:
     return blocks
 
 
-class ThreadWithResult(Thread):
-    def __init__(self, group=None, target=None, name=None, args=(), kwargs={}, *, daemon=None):
-        def function():
-            self.result = target(*args, **kwargs)
-        super().__init__(group=group, target=function, name=name, daemon=daemon)
-
-
 def run_with_ngrok(func, port, protocol='http', region='us', save_url=None, kwargs=None):
     ngrok.set_auth_token(NGROK_TOKEN)
     conf.get_default().region = region
@@ -236,6 +236,6 @@ def run_with_ngrok(func, port, protocol='http', region='us', save_url=None, kwar
     print(thread.result)
     if save_url:
         with open(save_url, 'w') as f:
-            f.write(thread.result.public_url)
+            f.write(thread.result.public_url + '/oauth2callback')
 
     func(**(kwargs or {}))

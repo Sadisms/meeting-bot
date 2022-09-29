@@ -83,7 +83,7 @@ class GoogleService:
 
             return creds
 
-        self.creds.redirect_uri = OAUTH_URL + '/oauth2callback'
+        self.creds.redirect_uri = OAUTH_URL()
         authorization_url, state = self.creds.authorization_url(
             access_type='offline',
         )
