@@ -2,9 +2,11 @@ import datetime
 import re
 from typing import Union
 from zoneinfo import ZoneInfo
+from threading import Thread
 
 import dateparser
 import pytimeparse
+from pyngrok import ngrok
 from slack_sdk.models.blocks import SectionBlock
 
 from data.config import MAX_LEN_SECTION_TEXT
@@ -215,3 +217,23 @@ def split_text_section(text: str) -> list[SectionBlock]:
         )
 
     return blocks
+
+
+class ThreadWithResult(Thread):
+    def __init__(self, group=None, target=None, name=None, args=(), kwargs={}, *, daemon=None):
+        def function():
+            self.result = target(*args, **kwargs)
+        super().__init__(group=group, target=function, name=name, daemon=daemon)
+
+
+def run_with_ngrok(func, port, protocol='http', region='us', save_url=None, kwargs=None):
+    thread = ThreadWithResult(target=ngrok.connect, args=(port, protocol), kwargs={'region': region})
+    thread.start()
+    thread.join()
+
+    print(thread.result)
+    if save_url:
+        with open(save_url, 'w') as f:
+            f.write(thread.result.public_url)
+
+    func(**(kwargs or {}))

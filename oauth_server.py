@@ -5,6 +5,7 @@ from api.google_api import GoogleService
 from blocks.meet import help_message_block
 from data.config import FLASK_SECRET_KEY, OAUTH_URL
 from utils.dbworker import get_user_for_state, set_user_credentials, delete_redirect_uri
+from utils.slack_help import run_with_ngrok
 
 app = Flask(__name__)
 app.secret_key = FLASK_SECRET_KEY
@@ -30,4 +31,4 @@ async def hello_world():
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0')
+    run_with_ngrok(app.run, 5000, save_url='etc\\oauth-server')

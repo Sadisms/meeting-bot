@@ -9,7 +9,6 @@ services:
       dockerfile: Dockerfile
     volumes:
       - .:/meeting-bot
-      - ./logs:/meeting-bot/logs
     command: python3 app.py
     network_mode: host
 
@@ -21,10 +20,7 @@ services:
       dockerfile: Dockerfile
     volumes:
       - .:/meeting-bot
-      - ./logs:/meeting-bot/logs
     command: python3 auth.py
-    networks:
-      - ngrok-network
 
   oauth-server:
     image: meeting-bot:latest
@@ -34,30 +30,5 @@ services:
       dockerfile: Dockerfile
     volumes:
       - .:/meeting-bot
-      - ./logs:/meeting-bot/logs
     command: python3 oauth_server.py
     network_mode: "host"
-    expose:
-      - "5000"
-
-  auth-bot-ngrok:
-      image: shkoliar/ngrok:latest
-      environment:
-        - PARAMS=http auth-bot:3000 --region=eu --authtoken=${NGROK_AUTH_TOKEN}
-      networks:
-        - ngrok-network
-      ports:
-        - "4551:4551"
-
-  oauth-server-ngrok:
-    image: shkoliar/ngrok:latest
-    networks:
-      - ngrok-network
-    environment:
-      - PARAMS=http oauth-server:5000 --region=ap --authtoken=${NGROK_AUTH_TOKEN}
-    ports:
-      - "4551:4551"
-
-networks:
-  ngrok-network:
-    driver: bridge
