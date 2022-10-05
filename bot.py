@@ -2,7 +2,7 @@ from slack_bolt.adapter.socket_mode.aiohttp import AsyncSocketModeHandler
 from slack_bolt.app.async_app import AsyncApp
 from slack_bolt.oauth.async_oauth_flow import AsyncOAuthFlow
 
-from data.config import SLACK_CONFIG
+from data.config import SLACK_CONFIG, SLACK_SCOPES
 from utils.logging import slack_logging
 
 app = AsyncApp(
@@ -14,7 +14,8 @@ app = AsyncApp(
         scopes=['chat:write', 'chat:write.public', 'commands', 'groups:history',
                 'groups:read', 'groups:write',
                 'im:read', 'im:write', 'im:history', 'mpim:write', 'users:read', 'users:read.email',
-                'users.profile:read', 'team:read']
+                'users.profile:read', 'team:read'],
+        user_scopes=SLACK_SCOPES['user_scopes']
     )
 )
 
