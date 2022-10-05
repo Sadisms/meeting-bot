@@ -80,18 +80,24 @@ def help_message_block():
                  'You can create meetings in chats or private messages, and if I can, '
                  'I will send an invitation directly to the chat or only to you.\n'
                  'To register an meet in the window send:\n'
-                 '> /call modal'
+                 '> /gmeet\n'
+                 'To quickly register a meeting, use the command:\n'
+                 '> /gmeetnow\n'
+                 'You can use the command in private messages, '
+                 'then your opponent will be automatically invited to the meeting.\n'
+                 ':exclamation: If you use shortcut messages in three in the channel to create a meeting, '
+                 'then the notification about the meeting will come in three on your behalf.\n'
         ),
         DividerBlock(),
         SectionBlock(
             text='By passing the window, you can register team meetings in this format:\n'
-                 '> /call [Meet name] at [Start time] for [Duration]'
+                 '> /gmeet [Meet name] at [Start time] for [Duration]'
         ),
         DividerBlock(),
         SectionBlock(
             text='Samples:\n'
-                 '> /call My Meet at 10 min for 1 hour\n'
-                 '> /call Demo meet at 11:00 for 10 min\n'
-                 '> /call Start meet at 13 sep 11:00 for 1h\n'
+                 '> /gmeet My Meet at 10 min for 1 hour\n'
+                 '> /gmeet Demo meet at 11:00 for 10 min\n'
+                 '> /gmeet Start meet at 13 sep 11:00 for 1h\n'
         )
     ]

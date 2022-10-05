@@ -15,6 +15,7 @@ def upgrade(migrator):
         table.primary_key('id')
         table.char('user_id')
         table.binary('credentials', null=True)
+        table.char('slack_token', null=True)
 
 
 def downgrade(migrator):

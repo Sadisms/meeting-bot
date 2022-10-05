@@ -37,8 +37,7 @@ ngrok http 5000 # Адрес занести в .env
 ```shell
 docker-compose build --no-cache bot
 docker-compose run bot python3 migrator.py migrate
-docker-compose up -d oauth-server
-docker-compose up -d bot
+docker-compose up -d bot oauth-server
 ```
 
 ### Авторизация в Google

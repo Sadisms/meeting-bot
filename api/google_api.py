@@ -7,9 +7,10 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 
 from blocks.meet import auth_block
-from data.config import GOOGLE_TOKEN_FILE, SCOPES, OAUTH_URL
-from utils.dbworker import get_user_credentials, set_user_credentials, create_redirect_uri
+from data.config import GOOGLE_TOKEN_FILE, SCOPES, OAUTH_URL, SLACK_SCOPES
+from utils.dbworker import get_user_credentials, set_user_credentials, create_redirect_uri, get_user_token
 from utils.logging import slack_logging
+from utils.slack_help import slack_oauth_link
 
 CALENDAR_ID = 'primary'
 
@@ -32,10 +33,6 @@ class GoogleService:
     def build_calendar(credentials):
         return build('calendar', 'v3', credentials=credentials)
 
-    @staticmethod
-    def _reformat_dates(date1, date2):
-        return f'{date1}T00:00:00+06:00', f'{date2}T23:59:00+06:00'
-
     def create_event(
             self, build,
             title='Meet',
@@ -43,6 +40,7 @@ class GoogleService:
             users=None,
             date1=datetime.now().isoformat(),
             date2=(datetime.now() + timedelta(minutes=15)).isoformat(),
+            **kwargs
     ):
         if users is None:
             users = []
@@ -74,32 +72,47 @@ class GoogleService:
 
         return new_event.get('hangoutLink'), uid_meet, new_event.get("id")
 
-    async def get_user_creds(self, user_id, token, respond):
+    async def get_user_creds(self, user_id, client, respond):
+        self.creds.redirect_uri = OAUTH_URL() + '/google'
+        authorization_url, state = self.creds.authorization_url(
+            access_type='offline'
+        )
+
         if creds := await get_user_credentials(user_id):
             if creds.expiry < datetime.utcnow():
                 request = google.auth.transport.requests.Request()
                 creds.refresh(request)
                 await set_user_credentials(user_id, creds)
 
-            return creds
+            if await get_user_token(user_id):
+                return creds
 
-        self.creds.redirect_uri = OAUTH_URL()
-        authorization_url, state = self.creds.authorization_url(
-            access_type='offline'
-        )
+            else:
+                authorization_url = slack_oauth_link(
+                    user_scopes=SLACK_SCOPES['user_scopes'],
+                    state=state
+                )
 
         await create_redirect_uri(
             user_id=user_id,
-            token=token,
+            token=client.token,
             state=state
         )
 
-        await respond(
-            blocks=auth_block(
-                text='Please visit this URL to authorize this application',
-                url=authorization_url
-            )
+        blocks = auth_block(
+            text='Please visit this URL to authorize this application',
+            url=authorization_url
         )
+
+        if respond.response_url:
+            await respond(
+                blocks=blocks
+            )
+        else:
+            await client.chat_postMessage(
+                channel=user_id,
+                blocks=blocks
+            )
 
     def _delete_event(
         self,

@@ -1,23 +1,26 @@
 import datetime
-from pytz import timezone
 import re
+
+from pytz import timezone
 from typing import Union
-from zoneinfo import ZoneInfo
 from threading import Thread
 
 import dateparser
 import pytimeparse
 from pyngrok import ngrok, conf
 from slack_sdk.models.blocks import SectionBlock
+from slack_sdk.web.async_client import AsyncWebClient
 
-from data.config import MAX_LEN_SECTION_TEXT, NGROK_TOKEN
+from data.config import MAX_LEN_SECTION_TEXT, NGROK_TOKEN, SLACK_CONFIG, OAUTH_URL
 from utils.cache import memoize
+from utils.dbworker import get_user_slack_token
 
 
 class ThreadWithResult(Thread):
     def __init__(self, group=None, target=None, name=None, args=(), kwargs={}, *, daemon=None):
         def function():
             self.result = target(*args, **kwargs)
+
         super().__init__(group=group, target=function, name=name, daemon=daemon)
 
 
@@ -28,7 +31,7 @@ async def _get_user_info(client, user_id):
 
 async def get_user_email(client, user_id):
     user = await _get_user_info(client, user_id)
-    return user['profile']['email']
+    return user['profile'].get('email')
 
 
 async def user_not_bot(client, user_id):
@@ -45,8 +48,6 @@ def get_str_date(date, time_zone) -> str:
 
 
 def parse_args_command(text: str = '', time_zone: str = 'Asia/Omsk') -> dict:
-    # TODO: Доделать парсинг
-
     args = {
         'date1': datetime.datetime.now(),
         'date2': (datetime.datetime.now() +
@@ -172,6 +173,9 @@ async def get_data_from_blocks(blocks: dict, skip=None) -> (dict, bool):
             elif item['type'] == 'timepicker':
                 data[block] = item['selected_time']
 
+            elif item['type'] == 'conversations_select':
+                data[block] = item['selected_conversation']
+
     return data, empty_data
 
 
@@ -182,15 +186,15 @@ def parse_date_and_time(date, time, time_zone):
 def td_format(td_object: datetime.timedelta) -> str:
     seconds = int(td_object.total_seconds())
     periods = [
-        ('year',        60*60*24*365),
-        ('month',       60*60*24*30),
-        ('day',         60*60*24),
-        ('hour',        60*60),
-        ('minute',      60),
-        ('second',      1)
+        ('year', 60 * 60 * 24 * 365),
+        ('month', 60 * 60 * 24 * 30),
+        ('day', 60 * 60 * 24),
+        ('hour', 60 * 60),
+        ('minute', 60),
+        ('second', 1)
     ]
 
-    strings=[]
+    strings = []
     for period_name, period_seconds in periods:
         if seconds > period_seconds:
             period_value, seconds = divmod(seconds, period_seconds)
@@ -231,7 +235,7 @@ def split_text_section(text: str) -> list[SectionBlock]:
     return blocks
 
 
-def run_with_ngrok(func, port, protocol='http', region='us', save_url=None, kwargs=None):
+def run_with_ngrok(func, port, protocol='http', region='us', save_url=None, kwargs=None, endpoint='/oauth2callback'):
     ngrok.set_auth_token(NGROK_TOKEN)
     conf.get_default().region = region
     thread = ThreadWithResult(target=ngrok.connect, args=(port, protocol))
@@ -241,10 +245,50 @@ def run_with_ngrok(func, port, protocol='http', region='us', save_url=None, kwar
     print(thread.result)
     if save_url:
         with open(save_url, 'w') as f:
-            f.write(thread.result.public_url + '/oauth2callback')
+            f.write(thread.result.public_url.replace('http:', 'https:') + endpoint)
 
     func(**(kwargs or {}))
 
 
 def get_time_zone_short_name(time_zone: str) -> str:
     return timezone(time_zone).tzname(datetime.datetime.now())
+
+
+def slack_oauth_link(
+        user_scopes: list,
+        client_id: str = SLACK_CONFIG['client_id'],
+        redirect_uri: str = '',
+        state: str = ''
+) -> (str, str):
+    if not redirect_uri:
+        redirect_uri = OAUTH_URL().replace('http:', 'https:') + '/slack'
+
+    SLACK_AUTH_LINK = 'https://slack.com/oauth/v2/authorize'
+
+    if client_id and isinstance(client_id, str):
+        SLACK_AUTH_LINK += f'?client_id={client_id}'
+
+        if user_scopes:
+            SLACK_AUTH_LINK += "&user_scope=" + ','.join(user_scopes)
+
+        if redirect_uri:
+            SLACK_AUTH_LINK += f'&redirect_uri={redirect_uri}'
+
+        if state:
+            SLACK_AUTH_LINK += f'&state={state}'
+
+        return SLACK_AUTH_LINK
+
+    else:
+        raise ValueError('Not found client id')
+
+
+async def get_users_for_dm(client: AsyncWebClient, channel_id: str, user_id: str) -> list[str | None]:
+    members = (await client.conversations_members(
+        channel=channel_id,
+        token=await get_user_slack_token(user_id)
+    )).data['members']
+    members.remove(user_id)
+
+    return members
+

@@ -21,10 +21,16 @@ FLASK_SECRET_KEY = env.str('FLASK_SECRET_KEY')
 MAX_LEN_SECTION_TEXT = 2999  # 3000
 
 SLACK_CONFIG = {
+    'bot_token': env.str('BOT_TOKEN'),
     'app_token': env.str('APP_TOKEN'),
     'client_id': env.str('CLIENT_ID'),
     'client_secret': env.str('CLIENT_SECRET'),
     'signing_secret': env.str('SIGNING_SECRET')
+}
+
+SLACK_SCOPES = {
+    'user_scopes': ['im:read', 'mpim:read', 'users:read', 'users:read.email',
+                    'channels:read', 'groups:read', 'chat:write']
 }
 
 DB_CONFIG = {
