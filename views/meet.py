@@ -114,3 +114,18 @@ def create_meet_view(
         close='Закрыть',
         callback_id='meet_view'
     )
+
+
+def alert_add_channel_view():
+    return View(
+        type='modal',
+        title='Добавь бота в канал',
+        blocks=[
+            SectionBlock(
+                text='Так как канал приватный, бот не может отправлять оповещения о собраниях.\n'
+                     'Для этого нужно добавить бота в канал.'
+            )
+        ],
+        close='Закрыть',
+        callback_id='meet_view'
+    )

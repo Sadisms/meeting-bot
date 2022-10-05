@@ -12,7 +12,7 @@ from utils.dbworker import get_user_slack_token
 from utils.slack_help import parse_args_command, get_user_tz, get_data_from_blocks, \
     get_user_email, parse_date_and_time, user_not_bot, get_like_data_str, get_duration, parse_datetime, \
     get_time_zone_short_name, get_users_for_dm
-from views.meet import create_meet_view
+from views.meet import create_meet_view, alert_add_channel_view
 
 
 async def send_meet(body, client, respond, time_zone, args=None, users=None):
@@ -68,14 +68,23 @@ async def gmeet_now(ack, body, client, respond):
             )
         except SlackApiError as e:
             if e.response['error'] == 'channel_not_found':
-                await client.chat_postMessage(
-                    channel=body['channel']['id'],
-                    blocks=block,
-                    thread_ts=body['message']['ts'],
-                    token=await get_user_slack_token(user_id)
-                )
-            else:
-                sentry_sdk.capture_exception(e)
+                try:
+                    await client.chat_postMessage(
+                        channel=body['channel']['id'],
+                        blocks=block,
+                        thread_ts=body['message']['ts'],
+                        token=await get_user_slack_token(user_id)
+                    )
+                    return
+
+                except SlackApiError as e:
+                    if e.response['error'] == 'channel_not_found':
+                        await client.views_open(
+                            view=alert_add_channel_view(),
+                            trigger_id=body['trigger_id']
+                        )
+
+            sentry_sdk.capture_exception(e)
 
 
 @app.command('/gmeetnow')
