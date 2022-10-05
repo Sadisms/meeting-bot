@@ -269,11 +269,11 @@ def slack_oauth_link(
     if client_id and isinstance(client_id, str):
         SLACK_AUTH_LINK += f'?client_id={client_id}'
 
-        if user_scopes:
-            SLACK_AUTH_LINK += "&user_scope=" + ','.join(user_scopes)
-
         if bot_scopes:
             SLACK_AUTH_LINK += "&scope=" + ','.join(bot_scopes)
+
+        if user_scopes:
+            SLACK_AUTH_LINK += "&user_scope=" + ','.join(user_scopes)
 
         if redirect_uri:
             SLACK_AUTH_LINK += f'&redirect_uri={redirect_uri}'
