@@ -18,16 +18,16 @@ def call_block(
 
     blocks = [
         SectionBlock(
-            text=f"<@{user_id}> created a meeting{(' with ' + ', '.join(f'<@{x}>' for x in users)) if users else '.'}\n"
-                 f"Title: *{title}*\n"
-                 f"Will Start at: *{start}*\n"
-                 f"For: *{duration}*"
+            text=f"<@{user_id}> создал встречу {(' для ' + ', '.join(f'<@{x}>' for x in users)) if users else '.'}\n"
+                 f"Название встречи: *{title}*\n"
+                 f"Начало: *{start}*\n"
+                 f"Длительность: *{duration}*"
         ),
         ActionsBlock(
             elements=[
                 ButtonElement(
                     action_id='stub',
-                    text='Join to meeting',
+                    text='Подключиться',
                     url=url,
                     style='primary'
                 )
@@ -39,7 +39,7 @@ def call_block(
         description_text = '\n'.join(
             [f">{x}" for x in description.split('\n')]
         )
-        description_header = 'Description: \n'
+        description_header = 'Описание: \n'
 
         if blocks[0].text.text.__len__() + (description_header + description_text).__len__() > MAX_LEN_SECTION_TEXT:
             description_blocks = split_text_section(
@@ -55,16 +55,16 @@ def call_block(
     return blocks
 
 
-def auth_block(text, url):
+def auth_block(url):
     return [
         SectionBlock(
-            text=text
+            text='Для авторизации в приложение нажми на кнопку'
         ),
         ActionsBlock(
             elements=[
                 ButtonElement(
                     action_id='delete',
-                    text='Connect',
+                    text='Авторизоваться',
                     style='primary',
                     url=url
                 )
@@ -76,26 +76,26 @@ def auth_block(text, url):
 def help_message_block():
     return [
         SectionBlock(
-            text='Hi, I am an application for creating meetings in Google Meet.\n'
-                 'You can create meetings in chats or private messages, and if I can, '
-                 'I will send an invitation directly to the chat or only to you.\n'
-                 'To register an meet in the window send:\n'
+            text='Привет, я приложение для создания встреч в Google Meet.\n'
+                 'Вы можете создавать встречи в чатах или личных сообщениях, и если я смогу, '
+                 'я отправлю приглашение непосредственно в чат или только вам.\n'
+                 'Чтобы зарегистрировать встречу в окне отправьте команду:\n'
                  '> /gmeet\n'
-                 'To quickly register a meeting, use the command:\n'
+                 'Чтобы быстро зарегистрировать встречу, используйте команду:\n'
                  '> /gmeetnow\n'
-                 'You can use the command in private messages, '
-                 'then your opponent will be automatically invited to the meeting.\n'
-                 ':exclamation: If you use shortcut messages in three in the channel to create a meeting, '
-                 'then the notification about the meeting will come in three on your behalf.\n'
+                 'Вы можете использовать команду в личных сообщениях, тогда ваш оппонент будет '
+                 'автоматически приглашен на встречу.\n'
+                 ':exclamation: Если вы используете shortcut`ы в треях в приватных каналах для создания собрания, '
+                 'то уведомление о собрании придет в трее от вашего имени.\n'
         ),
         DividerBlock(),
         SectionBlock(
-            text='By passing the window, you can register team meetings in this format:\n'
+            text='Помимо окна, вы можете зарегистрировать встречи команды в этом формате:\n'
                  '> /gmeet [Meet name] at [Start time] for [Duration]'
         ),
         DividerBlock(),
         SectionBlock(
-            text='Samples:\n'
+            text='Примеры:\n'
                  '> /gmeet My Meet at 10 min for 1 hour\n'
                  '> /gmeet Demo meet at 11:00 for 10 min\n'
                  '> /gmeet Start meet at 13 sep 11:00 for 1h\n'

@@ -18,27 +18,27 @@ def create_meet_view(
 
     time_options = [
           Option(
-              text=f'{x} mins',
+              text=f'{x} минут',
               value=str(x)
           ) for x in [15, 30, 45, 60]
     ]
 
     blocks = [
         InputBlock(
-            label='Title meet',
+            label='Название встречи',
             block_id='title',
             element=PlainTextInputElement(
                 initial_value='My Meet'
             )
         ),
         InputBlock(
-            label='Pick users from the list',
+            label='Гости',
             block_id='users',
             element=UserMultiSelectElement(),
             optional=not users
         ),
         SectionBlock(
-            text='Pick a date for the meeting',
+            text='Дата встречи',
             block_id='date1:date',
             accessory=DatePickerElement(
                 action_id='stub:1',
@@ -46,7 +46,7 @@ def create_meet_view(
             )
         ),
         SectionBlock(
-            text='Pick a time for the meeting',
+            text='Начало',
             block_id='date1:time',
             accessory=TimePickerElement(
                 action_id='stub:2',
@@ -54,7 +54,7 @@ def create_meet_view(
             )
         ),
         SectionBlock(
-            text='For how long will meeting last',
+            text='Длительность',
             block_id='date2',
             accessory=StaticSelectElement(
                 action_id='stub:3',
@@ -65,7 +65,7 @@ def create_meet_view(
             )
         ),
         InputBlock(
-            label='Description',
+            label='Описание',
             block_id='description',
             element=PlainTextInputElement(
                 multiline=True,
@@ -77,7 +77,7 @@ def create_meet_view(
     if channel:
         options = [
             Option(
-                text='Send an alert',
+                text='Отправить оповещение о встрече в каналы',
                 value='true'
             )
         ]
@@ -94,7 +94,7 @@ def create_meet_view(
                 ]
             ),
             InputBlock(
-                label='Channel',
+                label='Канал',
                 block_id='channel',
                 element=ConversationSelectElement(
                     default_to_current_conversation=True,
@@ -108,9 +108,9 @@ def create_meet_view(
 
     return View(
         type='modal',
-        title='Create Meet',
+        title='Создание встречи',
         blocks=blocks,
-        submit='Send',
-        close='Close',
+        submit='Отправить',
+        close='Закрыть',
         callback_id='meet_view'
     )

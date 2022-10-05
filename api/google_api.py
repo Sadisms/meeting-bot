@@ -100,7 +100,6 @@ class GoogleService:
         )
 
         blocks = auth_block(
-            text='Please visit this URL to authorize this application',
             url=authorization_url
         )
 
