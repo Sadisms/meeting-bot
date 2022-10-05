@@ -29,7 +29,11 @@ SLACK_CONFIG = {
 }
 
 SLACK_SCOPES = {
-    'user_scopes': ['im:read', 'mpim:read', 'channels:read', 'groups:read', 'chat:write']
+    'user_scopes': ['im:read', 'mpim:read', 'channels:read', 'groups:read', 'chat:write'],
+    'bot_scopes': ['chat:write', 'chat:write.public', 'commands', 'groups:history',
+                'groups:read', 'groups:write',
+                'im:read', 'im:write', 'im:history', 'mpim:write', 'users:read', 'users:read.email',
+                'users.profile:read', 'team:read']
 }
 
 DB_CONFIG = {

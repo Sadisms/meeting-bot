@@ -11,10 +11,7 @@ app = AsyncApp(
         database='._.db',
         client_id=SLACK_CONFIG['client_id'],
         client_secret=SLACK_CONFIG['client_secret'],
-        scopes=['chat:write', 'chat:write.public', 'commands', 'groups:history',
-                'groups:read', 'groups:write',
-                'im:read', 'im:write', 'im:history', 'mpim:write', 'users:read', 'users:read.email',
-                'users.profile:read', 'team:read'],
+        scopes=SLACK_SCOPES['bot_scopes'],
         user_scopes=SLACK_SCOPES['user_scopes']
     )
 )

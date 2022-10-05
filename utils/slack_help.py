@@ -256,6 +256,7 @@ def get_time_zone_short_name(time_zone: str) -> str:
 
 def slack_oauth_link(
         user_scopes: list,
+        bot_scopes: list,
         client_id: str = SLACK_CONFIG['client_id'],
         redirect_uri: str = '',
         state: str = ''
@@ -270,6 +271,9 @@ def slack_oauth_link(
 
         if user_scopes:
             SLACK_AUTH_LINK += "&user_scope=" + ','.join(user_scopes)
+
+        if bot_scopes:
+            SLACK_AUTH_LINK += "&scope=" + ','.join(bot_scopes)
 
         if redirect_uri:
             SLACK_AUTH_LINK += f'&redirect_uri={redirect_uri}'
