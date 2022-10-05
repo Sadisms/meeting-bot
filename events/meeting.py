@@ -1,6 +1,7 @@
 import re
 from contextlib import suppress
 
+import sentry_sdk
 from slack_sdk.errors import SlackApiError
 from slack_sdk.web.async_client import AsyncWebClient
 
@@ -46,7 +47,7 @@ async def send_meet(body, client, respond, time_zone, args=None, users=None):
 async def gmeet_now(ack, body, client, respond):
     await ack()
 
-    user_id = body.get('user_id') or body['user']['id']
+    user_id = body['user']['id']
     time_zone = await get_user_tz(client, user_id)
     args = parse_args_command(
         time_zone=time_zone
@@ -59,19 +60,22 @@ async def gmeet_now(ack, body, client, respond):
         time_zone=time_zone,
         args=args
     ):
-        if body.get('callback_id') == 'create_meet':
+        try:
             await client.chat_postMessage(
                 channel=body['channel']['id'],
                 blocks=block,
-                thread_ts=body['message']['ts'],
-                token=await get_user_slack_token(user_id)
+                thread_ts=body['message']['ts']
             )
-
-        else:
-            await respond(
-                blocks=block,
-                response_type='in_channel'
-            )
+        except SlackApiError as e:
+            if e.response['error'] == 'chat_not_found':
+                await client.chat_postMessage(
+                    channel=body['channel']['id'],
+                    blocks=block,
+                    thread_ts=body['message']['ts'],
+                    token=await get_user_slack_token(user_id)
+                )
+            else:
+                sentry_sdk.capture_exception(e)
 
 
 @app.command('/gmeetnow')
