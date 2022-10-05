@@ -101,28 +101,6 @@ async def init_call_command(ack, body, respond, client: AsyncWebClient):
         time_zone=time_zone
     )
 
-    if body['channel_name'] == 'directmessage':
-        users = await get_users_for_dm(
-            client=client,
-            channel_id=body['channel_id'],
-            user_id=user_id
-        )
-
-        args['users'] = [
-            {'email': await get_user_email(client, x)}
-            for x in users
-        ]
-
-        kwargs_view = dict(
-            init_user=users
-        )
-
-    else:
-        kwargs_view = dict(
-            users=False,
-            channel=True
-        )
-
     if text.startswith('help'):
         await respond(
             blocks=help_message_block()
@@ -136,6 +114,18 @@ async def init_call_command(ack, body, respond, client: AsyncWebClient):
             time_zone=time_zone,
             args=args
         ):
+            if body['channel_name'] == 'directmessage':
+                users = await get_users_for_dm(
+                    client=client,
+                    channel_id=body['channel_id'],
+                    user_id=user_id
+                )
+
+                args['users'] = [
+                    {'email': await get_user_email(client, x)}
+                    for x in users
+                ]
+
             await respond(
                 blocks=block,
                 response_type='in_channel'
@@ -144,6 +134,22 @@ async def init_call_command(ack, body, respond, client: AsyncWebClient):
     else:
         google_service = GoogleService()
         if await google_service.get_user_creds(user_id, client, respond):
+            if body['channel_name'] == 'directmessage':
+                users = await get_users_for_dm(
+                    client=client,
+                    channel_id=body['channel_id'],
+                    user_id=user_id
+                )
+
+                kwargs_view = dict(
+                    init_user=users
+                )
+
+            else:
+                kwargs_view = dict(
+                    users=False,
+                    channel=True
+                )
             await client.views_open(
                 trigger_id=body['trigger_id'],
                 view=create_meet_view(
