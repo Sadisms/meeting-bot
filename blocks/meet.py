@@ -91,7 +91,7 @@ def help_message_block():
         DividerBlock(),
         SectionBlock(
             text='Помимо окна, вы можете зарегистрировать встречи команды в этом формате:\n'
-                 '> /gmeet [Meet name] at [Start time] for [Duration]'
+                 '> /gmeet [Название встречи] at [Начало] for [Длительность]'
         ),
         DividerBlock(),
         SectionBlock(

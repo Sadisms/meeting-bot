@@ -77,7 +77,7 @@ def create_meet_view(
     if channel:
         options = [
             Option(
-                text='Отправить оповещение о встрече в каналы',
+                text='Отправить оповещение о встрече в канал',
                 value='true'
             )
         ]
