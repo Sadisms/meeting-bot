@@ -67,7 +67,7 @@ async def gmeet_now(ack, body, client, respond):
                 thread_ts=body['message']['ts']
             )
         except SlackApiError as e:
-            if e.response['error'] == 'chat_not_found':
+            if e.response['error'] == 'channel_not_found':
                 await client.chat_postMessage(
                     channel=body['channel']['id'],
                     blocks=block,
