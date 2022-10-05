@@ -24,7 +24,8 @@ async def oauth_google():
 
         url = slack_oauth_link(
             user_scopes=SLACK_SCOPES['user_scopes'],
-            state=state
+            state=state,
+            bot_scopes=SLACK_SCOPES['bot_scopes']
         )
 
         return redirect(url)
