@@ -284,11 +284,12 @@ def slack_oauth_link(
 
 
 async def get_users_for_dm(client: AsyncWebClient, channel_id: str, user_id: str) -> list[str | None]:
-    members = (await client.conversations_members(
-        channel=channel_id,
-        token=await get_user_slack_token(user_id)
-    )).data['members']
-    members.remove(user_id)
+    if token := await get_user_slack_token(user_id):
+        members = (await client.conversations_members(
+            channel=channel_id,
+            token=token
+        )).data['members']
+        members.remove(user_id)
 
-    return members
+        return members
 
