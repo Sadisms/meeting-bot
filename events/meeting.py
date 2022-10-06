@@ -102,12 +102,14 @@ async def init_call_command(ack, body, respond, client: AsyncWebClient):
     )
 
     kwargs_view = {}
+    user_ids = []
     if body['channel_name'] == 'directmessage':
         if users := await get_users_for_dm(
             client=client,
             channel_id=body['channel_id'],
             user_id=user_id
         ):
+            user_ids += users
             args['users'] = [
                 {'email': await get_user_email(client, x)}
                 for x in users
@@ -130,11 +132,12 @@ async def init_call_command(ack, body, respond, client: AsyncWebClient):
 
     elif text or body['command'] == '/gmeetnow':
         if block := await send_meet(
-                body=body,
-                client=client,
-                respond=respond,
-                time_zone=time_zone,
-                args=args
+            body=body,
+            client=client,
+            respond=respond,
+            time_zone=time_zone,
+            args=args,
+            users=user_ids
         ):
             await respond(
                 blocks=block,
