@@ -128,20 +128,22 @@ async def init_call_command(ack, body, respond, client: AsyncWebClient):
             blocks=help_message_block()
         )
 
-    elif block := await send_meet(
-            body=body,
-            client=client,
-            respond=respond,
-            time_zone=time_zone,
-            args=args
-    ):
-        if text or body['command'] == '/gmeetnow':
+    elif text or body['command'] == '/gmeetnow':
+        if block := await send_meet(
+                body=body,
+                client=client,
+                respond=respond,
+                time_zone=time_zone,
+                args=args
+        ):
             await respond(
                 blocks=block,
                 response_type='in_channel'
             )
 
-        else:
+    else:
+        google_service = GoogleService()
+        if await google_service.get_user_creds(user_id, client, respond):
             await client.views_open(
                 trigger_id=body['trigger_id'],
                 view=create_meet_view(
@@ -205,7 +207,6 @@ async def meet_view_send(ack, body, client, respond):
                 channel=user_id,
                 blocks=block
             )
-
 
 
 @app.action(re.compile("stub"))
