@@ -18,7 +18,7 @@ def call_block(
 
     blocks = [
         SectionBlock(
-            text=f"<@{user_id}> создал встречу {(' для ' + ', '.join(f'<@{x}>' for x in users)) if users else '.'}\n"
+            text=f"<@{user_id}> создал встречу{(' для ' + ', '.join(f'<@{x}>' for x in users)) if users else '.'}\n"
                  f"Название встречи: *{title}*\n"
                  f"Начало: *{start}*\n"
                  f"Длительность: *{duration}*"
