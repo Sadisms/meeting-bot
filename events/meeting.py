@@ -115,10 +115,10 @@ async def init_call_command(ack, body, respond, client: AsyncWebClient):
                     args['users'] += [
                         {'email': await get_user_email(client, user)}
                     ]
-
-            kwargs_view = dict(
-                init_user=user_ids[0]
-            )
+            if user_ids:
+                kwargs_view = dict(
+                    init_user=user_ids[0]
+                )
 
     else:
         kwargs_view = dict(
