@@ -29,11 +29,13 @@ async def _get_user_info(client, user_id):
     return (await client.users_info(user=user_id)).data['user']
 
 
+@memoize()
 async def get_user_email(client, user_id):
     user = await _get_user_info(client, user_id)
     return user['profile'].get('email')
 
 
+@memoize()
 async def user_not_bot(client, user_id):
     user = await _get_user_info(client, user_id)
     return not user['is_bot']
@@ -92,8 +94,9 @@ def parse_args_command(text: str = '', time_zone: str = 'Asia/Omsk') -> dict:
     return args
 
 
+@memoize()
 async def get_user_tz(client, user_id):
-    user = (await client.users_info(user=user_id)).data['user']
+    user = await _get_user_info(client, user_id)
     return user.get('tz', 'Asia/Omsk')
 
 
