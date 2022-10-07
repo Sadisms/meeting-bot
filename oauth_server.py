@@ -6,6 +6,7 @@ from api.google_api import GoogleService
 from blocks.meet import help_message_block
 from data.config import FLASK_SECRET_KEY, OAUTH_URL, SLACK_CONFIG, SLACK_SCOPES
 from utils.dbworker import get_user_for_state, set_user_credentials, delete_redirect_uri, set_user_slack_token
+from utils.logging import slack_logging
 from utils.slack_help import run_with_ngrok, slack_oauth_link
 
 app = Flask(__name__)
@@ -29,11 +30,7 @@ async def oauth_google():
 
         return redirect(url)
 
-    return """
-    <script>
-    window.close();
-    </script>
-    """
+    return redirect('slack://')
 
 
 @app.route('/oauth2callback/slack')
@@ -61,11 +58,9 @@ async def oauth_slack():
             blocks=help_message_block()
         )
 
-    return """
-        <script>
-        window.close();
-        </script>
-        """
+        slack_logging.info(f"User {user.user_id} authorize")
+
+    return redirect('slack://')
 
 
 if __name__ == "__main__":

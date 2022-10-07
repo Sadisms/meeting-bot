@@ -29,7 +29,8 @@ async def send_meet(body, client, respond, time_zone, args=None, users=None):
         build = google_service.build_calendar(creds)
         meet_url, *_ = google_service.create_event(
             **args,
-            build=build
+            build=build,
+            user_id=user_id
         )
 
         return call_block(

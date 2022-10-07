@@ -43,6 +43,7 @@ class GoogleService:
             users=None,
             date1=datetime.now().isoformat(),
             date2=(datetime.now() + timedelta(minutes=15)).isoformat(),
+            user_id=None,
             **kwargs
     ):
         if users is None:
@@ -71,7 +72,7 @@ class GoogleService:
             body=body,
             conferenceDataVersion=1
         ).execute()
-        slack_logging.info(f'Created event {new_event.get("id")} {uid_meet}, {date1} - {date2}')
+        slack_logging.info(f'User {user_id} created event {new_event.get("id")} {uid_meet}, {date1} - {date2}')
 
         return new_event.get('hangoutLink'), uid_meet, new_event.get("id")
 
