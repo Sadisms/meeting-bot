@@ -1,8 +1,9 @@
 import uuid
 from datetime import datetime, timedelta
 
-
+import requests
 import google.auth.transport.requests
+from google.auth.exceptions import RefreshError
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 
@@ -16,6 +17,8 @@ CALENDAR_ID = 'primary'
 
 
 class GoogleService:
+    GOOGLE_OAUTH_URL = 'https://oauth2.googleapis.com'
+
     def __init__(self):
         self.service = None
 
@@ -81,8 +84,14 @@ class GoogleService:
         if creds := await get_user_credentials(user_id):
             if creds.expiry < datetime.utcnow():
                 request = google.auth.transport.requests.Request()
-                creds.refresh(request)
-                await set_user_credentials(user_id, creds)
+                try:
+                    creds.refresh(request)
+                    await set_user_credentials(user_id, creds)
+
+                except RefreshError:
+                    requests.post(self.GOOGLE_OAUTH_URL + '/revoke',
+                                  params={'token': creds.token},
+                                  headers={'content-type': 'application/x-www-form-urlencoded'})
 
             if await get_user_token(user_id):
                 return creds
@@ -114,9 +123,9 @@ class GoogleService:
             )
 
     def _delete_event(
-        self,
-        build,
-        event_id
+            self,
+            build,
+            event_id
     ):
         build.events().delete(
             calendarId=self.calendar_id,
