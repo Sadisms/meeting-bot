@@ -111,7 +111,7 @@ async def init_call_command(ack, body, respond, client: AsyncWebClient):
         ):
             for user in users:
                 if await user_not_bot(client, user):
-                    user_ids.append(users)
+                    user_ids.append(user)
                     if args.get("users"):
                         args['users'] += [
                             {'email': await get_user_email(client, user)}
