@@ -43,6 +43,11 @@ DB_CONFIG = {
     'password': env.str('DB_PASS'),
 }
 
+ELK_CONFIG = {
+    'host': env.str('ELK_HOST'),
+    'port': env.str('ELK_PORT'),
+    'prefix': env.str('ELK_PREFIX')
+}
 
 def OAUTH_URL():
     with open('etc/oauth-server', 'r') as f:
