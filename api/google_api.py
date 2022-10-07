@@ -99,7 +99,7 @@ class GoogleService:
                 except RefreshError:
                     await self.revoke_creds(creds)
 
-            elif not await self.test_creds():
+            elif not await self.test_creds(creds):
                 await self.revoke_creds(creds)
 
             elif await get_user_token(user_id):
