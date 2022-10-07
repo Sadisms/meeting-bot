@@ -109,14 +109,15 @@ async def init_call_command(ack, body, respond, client: AsyncWebClient):
             channel_id=body['channel_id'],
             user_id=user_id
         ):
-            user_ids += users
-            args['users'] = [
-                {'email': await get_user_email(client, x)}
-                for x in users
-            ]
+            for user in users:
+                if await user_not_bot(client, user):
+                    user_ids += [users]
+                    args['users'] += [
+                        {'email': await get_user_email(client, user)}
+                    ]
 
             kwargs_view = dict(
-                init_user=users
+                init_user=user_ids[0]
             )
 
     else:
