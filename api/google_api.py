@@ -75,6 +75,14 @@ class GoogleService:
 
         return new_event.get('hangoutLink'), uid_meet, new_event.get("id")
 
+    async def test_creds(self, creds):
+        self.build_calendar(creds).files().list().execute()
+
+    async def revoke_creds(self, creds):
+        requests.post(self.GOOGLE_OAUTH_URL + '/revoke',
+                      params={'token': creds.token},
+                      headers={'content-type': 'application/x-www-form-urlencoded'})
+
     async def get_user_creds(self, user_id, client, respond):
         self.creds.redirect_uri = OAUTH_URL() + '/google'
         authorization_url, state = self.creds.authorization_url(
@@ -89,11 +97,12 @@ class GoogleService:
                     await set_user_credentials(user_id, creds)
 
                 except RefreshError:
-                    requests.post(self.GOOGLE_OAUTH_URL + '/revoke',
-                                  params={'token': creds.token},
-                                  headers={'content-type': 'application/x-www-form-urlencoded'})
+                    await self.revoke_creds(creds)
 
-            if await get_user_token(user_id):
+            elif not await self.test_creds():
+                await self.revoke_creds(creds)
+
+            elif await get_user_token(user_id):
                 return creds
 
             else:
