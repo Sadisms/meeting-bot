@@ -76,7 +76,9 @@ class GoogleService:
         return new_event.get('hangoutLink'), uid_meet, new_event.get("id")
 
     async def test_creds(self, creds):
-        self.build_calendar(creds).events().list().execute()
+        self.build_calendar(creds).events().list(
+            calendarId=self.calendar_id,
+        ).execute()
 
     async def revoke_creds(self, creds):
         requests.post(self.GOOGLE_OAUTH_URL + '/revoke',
