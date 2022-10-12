@@ -2,6 +2,7 @@ from slack_bolt.adapter.socket_mode.aiohttp import AsyncSocketModeHandler
 from slack_bolt.app.async_app import AsyncApp
 from slack_bolt.oauth.async_oauth_flow import AsyncOAuthFlow
 
+from api.google_api import GoogleService
 from data.config import SLACK_CONFIG, SLACK_SCOPES
 from utils.logging import slack_logging
 
@@ -15,6 +16,8 @@ app = AsyncApp(
         user_scopes=SLACK_SCOPES['user_scopes']
     )
 )
+
+google_service = GoogleService()
 
 
 async def start_bot():

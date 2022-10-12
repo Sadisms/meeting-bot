@@ -5,9 +5,8 @@ import sentry_sdk
 from slack_sdk.errors import SlackApiError
 from slack_sdk.web.async_client import AsyncWebClient
 
-from api.google_api import GoogleService
 from blocks.meet import call_block, help_message_block
-from bot import app
+from bot import app, google_service
 from utils.dbworker import get_user_slack_token
 from utils.slack_help import parse_args_command, get_user_tz, get_data_from_blocks, \
     get_user_email, parse_date_and_time, user_not_bot, get_like_data_str, get_duration, parse_datetime, \
@@ -24,7 +23,6 @@ async def send_meet(body, client, respond, time_zone, args=None, users=None):
 
     user_id = body.get('user_id') or body.get('user', {}).get('id')
 
-    google_service = GoogleService()
     if creds := await google_service.get_user_creds(user_id, client, respond):
         build = google_service.build_calendar(creds)
         meet_url, *_ = google_service.create_event(
@@ -102,8 +100,11 @@ async def init_call_command(ack, body, respond, client: AsyncWebClient):
         time_zone=time_zone
     )
 
-    kwargs_view = {}
-    user_ids = []
+    kwargs_view = dict(
+        users=False,
+        channel=True
+    )
+
     if body['channel_name'] == 'directmessage':
         if users := await get_users_for_dm(
             client=client,
@@ -111,28 +112,15 @@ async def init_call_command(ack, body, respond, client: AsyncWebClient):
             user_id=user_id
         ):
             for user in users:
-                if await user_not_bot(client, user):
-                    user_ids.append(user)
-                    if args.get("users"):
-                        args['users'] += [
-                            {'email': await get_user_email(client, user)}
-                        ]
-
-                    else:
-                        args['users'] = [
-                            {'email': await get_user_email(client, user)}
-                        ]
-
-            if user_ids:
+                args['users'] = []
                 kwargs_view = dict(
-                    init_user=user_ids[0]
+                    init_user=[]
                 )
-
-    else:
-        kwargs_view = dict(
-            users=False,
-            channel=True
-        )
+                if await user_not_bot(client, user):
+                    kwargs_view['init_user'].append(user)
+                    args['users'].append(
+                        {'email': await get_user_email(client, user)}
+                    )
 
     if text.startswith('help'):
         await respond(
@@ -146,7 +134,7 @@ async def init_call_command(ack, body, respond, client: AsyncWebClient):
             respond=respond,
             time_zone=time_zone,
             args=args,
-            users=user_ids
+            users=kwargs_view.get('init_user')
         ):
             await respond(
                 blocks=block,
@@ -154,7 +142,6 @@ async def init_call_command(ack, body, respond, client: AsyncWebClient):
             )
 
     else:
-        google_service = GoogleService()
         if await google_service.get_user_creds(user_id, client, respond):
             await client.views_open(
                 trigger_id=body['trigger_id'],
