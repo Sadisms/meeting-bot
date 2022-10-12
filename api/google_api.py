@@ -7,11 +7,11 @@ from google.auth.exceptions import RefreshError
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 
-from blocks.meet import auth_block
+import blocks.meet as blocks_meet
 from data.config import GOOGLE_TOKEN_FILE, SCOPES, OAUTH_URL, SLACK_SCOPES
 from utils.dbworker import get_user_credentials, set_user_credentials, create_redirect_uri, get_user_token
 from utils.logging import slack_logging
-from utils.slack_help import slack_oauth_link
+import utils.slack_help as slack_help
 
 CALENDAR_ID = 'primary'
 
@@ -114,7 +114,7 @@ class GoogleService:
                 return creds
 
             else:
-                authorization_url = slack_oauth_link(
+                authorization_url = slack_help.slack_oauth_link(
                     user_scopes=SLACK_SCOPES['user_scopes'],
                     state=state
                 )
@@ -125,7 +125,7 @@ class GoogleService:
             state=state
         )
 
-        blocks = auth_block(
+        blocks = blocks_meet.auth_block(
             url=authorization_url
         )
 
